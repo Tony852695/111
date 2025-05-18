@@ -49,7 +49,7 @@ const deviceIcons = {
 	Fridge: faBox,
 	Light: faLightbulb,
 	Wifi: faWifi,
-	Thermostat: faThermometerHalf,
+	Thermostat: faThermometerHalf,	
 	Speaker: faMusic,
 	SmartLock: faLock,
 	Curtain: faWindowMaximize,
