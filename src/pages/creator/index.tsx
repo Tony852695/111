@@ -7,6 +7,7 @@ import { Input, Avatar } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 
+
 const { Footer } = Layout;
 
 const { Header, Sider, Content } = Layout;
@@ -70,10 +71,19 @@ const App: React.FC = () => {
         borderRadius: 8,
         maxWidth: '70%',
         border: '1px solid #e6f7ff',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-      }}>
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+        cursor: isAI ? 'pointer' : 'default' // 添加鼠标手势
+
+      }}
+      onClick={() => {
+        if(isAI) {
+          // 执行页面跳转逻辑
+          window.location.href = '/LoginPage'; // 根据实际路由配置调整
+        }
+      }}
+      >
         {text}
-        {isAI && (
+        {isAI && img && (
           <div style={{ marginTop: 8,
             border: '1px solid #1890ff' 
            }}>
@@ -101,8 +111,14 @@ const App: React.FC = () => {
   );
   
   const ChatInterface = () => {
+    const [replyVersion, setReplyVersion] = React.useState(9);
 
     const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+  const [userInput, setUserInput] = React.useState('');
+  const [messages, setMessages] = React.useState([
+    { text: '你好！我是翌界AI助手,请告诉我你想要的界面设计风格,我会为你生成完美的用户界面。', isAI: true, img: "" },
+  ]);
 
     const showModal = () => {
       setIsModalOpen(true);
@@ -111,12 +127,57 @@ const App: React.FC = () => {
     const handleCancel = () => {
       setIsModalOpen(false);
     };
+    const VERSION_CONTENTS = [
+      { 
+        text: "好的！您希望这个界面包含哪些内容呢？",
+        img: "",
 
-    const messages = [
-      { text: '修改已完成,以下是v7版本', isAI: true,img:"v7.png"  },
-      { text: '左侧边栏：点赞、收藏、我的帖子、设置这四个按键和图标、文字等比例放大。热门话题和下列各话题的文字都放大,排序的序号数字用蓝色的字体。', isAI: false,img:""   },
-      { text: '修改已完成,以下是v8版本', isAI: true,img:"v8.png"  },
+      },
+      {
+        text: "好的,我将为您生成智能家具界面。根据您的需求,智能家居界面要包含常用设备开关与数据监测统计功能。请问您家中一共有哪些智能家具设备呢？",
+        img: "",
+      },
+      {
+        text: "好的。正在为您生成智能家居界面。", 
+        img: "1.png",
+      },
+      {
+        text: "好的！我将为您在主页轮播家中智能摄像头的实时画面，并对整个房间的耗电量进行实时监控，实现对家庭设备的实时检测与控制。",
+        img: "2.png",
+      },     
+       {
+        text: "好的，我将为您生成设备界面，可以对所有的设备进行便捷操作。",
+        img: "3.png",
+      },     
+       {
+        text: "好的,我将结合大数据,为您生成智能分析界面,同时,您还可以在主页右上方点击输入指令，我会对您的要求进行智能回答。",
+        img: "4.png",
+      }
+
     ];
+    const handleSend = () => {
+      if (userInput.trim()) {
+        const versionIndex = (replyVersion - 9) % VERSION_CONTENTS.length;
+        const { text, img,  } = VERSION_CONTENTS[versionIndex];
+        setMessages(prev => [...prev, { text: userInput, isAI: false, img: "" }]);
+        setUserInput('');
+        
+        // 根据输入内容生成不同回复
+ 
+        
+        // 模拟AI回复
+        setTimeout(() => {
+          setMessages(prev => [...prev, { 
+            text: text,
+            isAI: true, 
+            img: img
+          }]);
+          setReplyVersion(prev => prev + 1);
+        }, 500);
+      }
+    };
+
+
     return (
       <Layout style={{
         height: 'calc(100vh - 112px)',
@@ -132,9 +193,14 @@ const App: React.FC = () => {
           overflowY: 'auto',
           background: '#fafafa'
         }}>
-          {messages.map((msg, index) => (
-            <ChatMessage key={index} isAI={msg.isAI} text={msg.text} img={msg.img} />
-          ))}
+ {messages.map((msg, index) => (
+          <ChatMessage 
+            key={index} 
+            isAI={msg.isAI} 
+            text={msg.text} 
+            img={msg.img} 
+          />
+        ))}
         </Content>
   
         <Footer style={{
@@ -142,12 +208,15 @@ const App: React.FC = () => {
           borderTop: '1px solid #f0f0f0',
           background: '#fff'
         }}>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Input.TextArea
-              placeholder="输入消息..."
-              autoSize={{ minRows: 1, maxRows: 4 }}
-              style={{ borderRadius: 20 }}
-            />&nbsp;&nbsp;
+           <div style={{ display: 'flex', gap: 8 }}>
+          <Input.TextArea
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            placeholder="输入消息..."
+            autoSize={{ minRows: 1, maxRows: 4 }}
+            style={{ borderRadius: 20 }}
+          />&nbsp;&nbsp;
             <Button 
               type="default" 
               icon={<AudioOutlined style={{color:'white'}} />}
@@ -208,6 +277,7 @@ const App: React.FC = () => {
               type="primary" 
               shape="circle" 
               icon={<SendOutlined />}
+              onClick={handleSend}
               style={{ 
                 backgroundColor: '#1890ff',
                 borderColor: '#1890ff'
@@ -400,6 +470,7 @@ const App: React.FC = () => {
     </Space>
   </div>
 </Content>
+
 
         {/* 右侧侧边栏 - 卡片样式 */}
         <ChatInterface />
